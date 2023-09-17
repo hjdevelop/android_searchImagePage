@@ -1,5 +1,6 @@
 package com.example.android_searchimagepage
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     }
     //MainActivity에 띄울 View
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun initView() {
         val fragmentList = ArrayList<Fragment>()
         fragmentList.add(SearchFragment())
