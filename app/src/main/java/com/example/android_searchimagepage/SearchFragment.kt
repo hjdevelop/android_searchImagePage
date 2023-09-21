@@ -1,12 +1,20 @@
 package com.example.android_searchimagepage
 
+import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.android_searchimagepage.Client.apiService
 import com.example.android_searchimagepage.databinding.FragmentSearchBinding
+import retrofit2.Call
+import retrofit2.Response
+import javax.security.auth.callback.Callback
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -22,11 +30,18 @@ class SearchFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private lateinit var mContext : Context
+    private lateinit var adapter: CustomAdapter
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
     private val dataList = mutableListOf<SearchData>()
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mContext = context
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,18 +62,22 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.recyclerView.layoutManager = GridLayoutManager(mContext, 2)
 
-        dataList.add(SearchData(R.drawable.image_sample, "테스트입니다!~", "어쩌구 저쩌구"))
-        dataList.add(SearchData(R.drawable.image_sample, "테스트입니다!~", "어쩌구 저쩌구"))
-        dataList.add(SearchData(R.drawable.image_sample, "테스트입니다!~", "어쩌구 저쩌구"))
-        dataList.add(SearchData(R.drawable.image_sample, "테스트입니다!~", "어쩌구 저쩌구"))
-        dataList.add(SearchData(R.drawable.image_sample, "테스트입니다!~", "어쩌구 저쩌구"))
-        dataList.add(SearchData(R.drawable.image_sample, "테스트입니다!~", "어쩌구 저쩌구"))
-        dataList.add(SearchData(R.drawable.image_sample, "테스트입니다!~", "어쩌구 저쩌구"))
+        adapter = CustomAdapter(mContext)
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.itemAnimator = null
 
-        binding.recyclerView.adapter = CustomAdapter(dataList)
-
-        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.searchButton.setOnClickListener {
+            val searchWord = binding.searchEditText.text.toString()
+            if(searchWord.isNotEmpty()) {
+                searchImageResult(searchWord)
+                dataList.clear()
+            }
+            else {
+                Toast.makeText(requireContext(), "검색어를 입력해주세요.", Toast.LENGTH_LONG).show()
+            }
+        }
 
 
     }
@@ -86,5 +105,36 @@ class SearchFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun searchImageResult(query : String) {
+        apiService.imageSearch(Constants.AUTH_HEADER, query, "recency", 1, 80)
+            ?.enqueue(object : retrofit2.Callback<SearchDataModel?> {
+                override fun onResponse(call: Call<SearchDataModel?>, response: Response<SearchDataModel?>) {
+                    response.body()?.metaData?.let { meta ->
+                        if (meta.totalCount > 0) {
+                            response.body()!!.documents.forEach { document ->
+                                val title = document.siteName
+                                val datetime = document.datetime
+                                val url = document.thumbnailUrl
+                                dataList.add(SearchData(url, title, datetime))
+                                Log.d("DataList", "Item: $dataList")
+                            }
+                        }
+                    }
+                    adapter.searchItem = dataList
+                    if(adapter.searchItem.isNotEmpty()) {
+                        adapter.searchItem = dataList
+                    }
+                    else {
+                        adapter.searchItem.clear()
+                        adapter.searchItem = dataList
+                    }
+                    adapter.notifyDataSetChanged()
+                }
+
+                override fun onFailure(call: Call<SearchDataModel?>, t: Throwable) {
+                }
+            })
     }
 }
