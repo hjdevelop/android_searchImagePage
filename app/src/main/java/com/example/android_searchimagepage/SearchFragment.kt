@@ -14,6 +14,9 @@ import com.example.android_searchimagepage.Client.apiService
 import com.example.android_searchimagepage.databinding.FragmentSearchBinding
 import retrofit2.Call
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.security.auth.callback.Callback
 
 // TODO: Rename parameter arguments, choose names that match
@@ -115,7 +118,7 @@ class SearchFragment : Fragment() {
                         if (meta.totalCount > 0) {
                             response.body()!!.documents.forEach { document ->
                                 val title = document.siteName
-                                val datetime = document.datetime
+                                val datetime = changeDateFormat(document.datetime)
                                 val url = document.thumbnailUrl
                                 dataList.add(SearchData(url, title, datetime))
                                 Log.d("DataList", "Item: $dataList")
@@ -136,5 +139,13 @@ class SearchFragment : Fragment() {
                 override fun onFailure(call: Call<SearchDataModel?>, t: Throwable) {
                 }
             })
+    }
+    private fun changeDateFormat(datetime : String) : String {
+        val inputDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault())
+        val outputDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        val date : Date = inputDateFormat.parse(datetime)
+
+        return outputDateFormat.format(date)
     }
 }
