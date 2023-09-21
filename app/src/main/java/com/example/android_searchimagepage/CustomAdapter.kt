@@ -1,6 +1,7 @@
 package com.example.android_searchimagepage
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -25,6 +26,12 @@ class CustomAdapter(private val context : Context) : RecyclerView.Adapter<Custom
 
         holder.title.text = item.title
         holder.date.text = item.dateTime
+        if(item.bookMark) {
+            holder.bookmark.setImageResource(R.drawable.ic_filled_bookmark)
+        }
+        else {
+            holder.bookmark.setImageResource(R.drawable.ic_bookmark)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -35,5 +42,19 @@ class CustomAdapter(private val context : Context) : RecyclerView.Adapter<Custom
         val image = binding.searchImageImageView
         val title = binding.searchTitleTextView
         val date = binding.searchDateTextView
+        val bookmark = binding.bookmarkImageButton
+
+        init {
+            binding.bookmarkImageButton.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val item = searchItem[position]
+                    // 북마크 상태를 토글 (true -> false, false -> true)
+                    item.bookMark = !item.bookMark
+                    // 아이템 데이터 갱신
+                    notifyItemChanged(position)
+                }
+            }
+        }
     }
 }

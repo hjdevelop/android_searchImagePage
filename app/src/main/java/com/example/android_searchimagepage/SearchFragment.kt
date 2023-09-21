@@ -142,7 +142,7 @@ class SearchFragment : Fragment() {
     }
     private fun changeDateFormat(datetime : String) : String {
         val inputDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault())
-        val outputDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val outputDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
         val date : Date = inputDateFormat.parse(datetime)
 
