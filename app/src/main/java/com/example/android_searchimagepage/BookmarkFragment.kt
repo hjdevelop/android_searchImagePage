@@ -1,10 +1,15 @@
 package com.example.android_searchimagepage
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
+import com.example.android_searchimagepage.databinding.FragmentBookmarkBinding
+import com.example.android_searchimagepage.databinding.FragmentSearchBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,6 +26,17 @@ class BookmarkFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private lateinit var mContext : Context
+    private lateinit var adapter: BookmarkAdapter
+
+    private var _binding: FragmentBookmarkBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mContext = context
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -33,8 +49,29 @@ class BookmarkFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_bookmark, container, false)
+        _binding = FragmentBookmarkBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.recyclerView.layoutManager = GridLayoutManager(mContext, 2)
+
+        adapter = BookmarkAdapter(mContext)
+
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.itemAnimator = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val bookmarkItem = (context as MainActivity).bookmarkItem
+        Log.d("FragmentBookmark", "${bookmarkItem.map { it.title }}")
+
+        adapter.bookmarkItem = bookmarkItem.toMutableList()
+        adapter.notifyDataSetChanged()
     }
 
     companion object {
@@ -55,5 +92,10 @@ class BookmarkFragment : Fragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

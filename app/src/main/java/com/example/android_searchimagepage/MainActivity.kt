@@ -3,6 +3,7 @@ package com.example.android_searchimagepage
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import com.example.android_searchimagepage.databinding.ActivityMainBinding
 import com.google.android.material.tabs.TabLayoutMediator
@@ -10,6 +11,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    var bookmarkItem = mutableListOf<SearchData>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -39,7 +42,19 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }.attach()
+    }
 
+    fun addBookmarkItem(item : SearchData) {
+        if(bookmarkItem.contains(item)) {
+        }
+        else {
+            bookmarkItem.add(item)
+        }
+        Log.d("addBookmark", "${bookmarkItem.map { it.title }}")
+    }
 
+    fun removeBookmarkItem(item : SearchData) {
+        bookmarkItem.remove(item)
+        Log.d("removeBookmark", "${bookmarkItem.map { it.title }}")
     }
 }
