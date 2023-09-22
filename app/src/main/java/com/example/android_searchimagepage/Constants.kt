@@ -6,6 +6,6 @@ class Constants {
         const val BASE_URL = "https://dapi.kakao.com"
 
         // 개인 API 사용
-        const val AUTH_HEADER = "KakaoAK 6584ce7b52495fea2b93d6bdb9df2829"
+        const val AUTH_HEADER = "KakaoAK {API_KEY(Git 푸쉬를 위해 삭제)}"
     }
 }
